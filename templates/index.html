@@ -1,21 +1,416 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>PeopleDesk · Employee Directory</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Employee Assistant</title>
   <style>
-    :root{--ink:#edf1ff;--muted:#a8b1cf;--line:rgba(255,255,255,.13);--panel:rgba(13,19,45,.62);--accent:#8b7cff;--teal:#5ce1c6;--danger:#ff7f9f}*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#090d20;overflow-x:hidden}body:before,body:after{content:"";position:fixed;border-radius:50%;filter:blur(12px);pointer-events:none;z-index:-1}body:before{width:42rem;height:42rem;background:#372b83;top:-25rem;right:-12rem;opacity:.7}body:after{width:36rem;height:36rem;background:#00665e;bottom:-20rem;left:-13rem;opacity:.48}.shell{width:min(1180px,calc(100% - 32px));margin:auto;padding:30px 0 48px}.top{display:flex;justify-content:space-between;gap:24px;align-items:center;margin-bottom:34px}.brand{display:flex;align-items:center;gap:13px;font-weight:780;letter-spacing:-.03em;font-size:20px}.mark{width:38px;height:38px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,#a599ff,#5ce1c6);color:#11152d;box-shadow:0 8px 26px #0006}.eyebrow{font-size:12px;color:var(--teal);font-weight:700;letter-spacing:.12em;text-transform:uppercase}.hero{display:flex;justify-content:space-between;gap:28px;align-items:end;margin-bottom:28px}.hero h1{font-size:clamp(31px,5vw,52px);letter-spacing:-.055em;line-height:1.02;margin:8px 0 11px}.hero p{margin:0;color:var(--muted);max-width:540px}.button{border:0;border-radius:12px;padding:11px 15px;cursor:pointer;font:inherit;font-weight:700;color:#10142a;background:var(--teal);box-shadow:0 10px 25px #0004;transition:.2s}.button:hover{transform:translateY(-2px);filter:brightness(1.06)}.button.secondary{background:rgba(255,255,255,.08);color:var(--ink);box-shadow:none;border:1px solid var(--line)}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}.card,.directory,dialog{background:var(--panel);border:1px solid var(--line);box-shadow:0 18px 50px #0004;backdrop-filter:blur(18px)}.card{border-radius:18px;padding:18px}.card span{display:block;color:var(--muted);font-size:13px}.card strong{font-size:27px;letter-spacing:-.04em;display:block;margin-top:8px}.directory{border-radius:20px;overflow:hidden}.toolbar{padding:16px;display:flex;gap:12px;border-bottom:1px solid var(--line)}.search{flex:1;min-width:0;background:#ffffff0c;border:1px solid var(--line);border-radius:11px;padding:10px 12px;color:var(--ink);font:inherit;outline:none}.search:focus{border-color:#9e95ff;box-shadow:0 0 0 3px #8b7cff2b}table{border-collapse:collapse;width:100%}th,td{padding:15px 18px;text-align:left;border-bottom:1px solid #ffffff0d}th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}tr:last-child td{border:0}tbody tr{transition:background .18s}tbody tr:hover{background:#ffffff09}.person{display:flex;align-items:center;gap:11px;font-weight:700}.avatar{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#816ff0,#426b8e);font-size:12px}.role{display:inline-flex;padding:4px 9px;border-radius:999px;background:#ffffff12;color:#d8dcff;font-size:12px}.actions{display:flex;gap:7px}.icon{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:5px;border-radius:7px;font-size:15px}.icon:hover{background:#fff1;color:white}.empty{padding:44px;text-align:center;color:var(--muted)}dialog{color:var(--ink);border-radius:20px;padding:0;width:min(460px,calc(100% - 32px));max-width:none}dialog::backdrop{background:#050716aa;backdrop-filter:blur(4px)}.dialog-head{display:flex;justify-content:space-between;align-items:center;padding:20px 22px 12px}.dialog-head h2{margin:0;font-size:21px}.form{padding:10px 22px 22px;display:grid;gap:14px}label{display:grid;gap:6px;color:var(--muted);font-size:13px;font-weight:650}input{width:100%;border:1px solid var(--line);border-radius:10px;background:#ffffff0b;color:var(--ink);padding:11px;font:inherit;outline:none}.form input:focus{border-color:var(--accent)}.form-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:5px}.toast{position:fixed;right:24px;bottom:24px;background:#172243;border:1px solid var(--line);padding:12px 15px;border-radius:12px;box-shadow:0 12px 35px #0008;transform:translateY(80px);opacity:0;transition:.25s}.toast.show{transform:none;opacity:1}.toast.error{border-color:#ff7f9f;color:#ffd3de}@media(max-width:760px){.shell{width:min(100% - 22px,1180px)}.top,.hero{align-items:flex-start;flex-direction:column}.cards{grid-template-columns:repeat(2,1fr)}.directory{overflow:auto}table{min-width:680px}.toolbar{min-width:680px}}@media(max-width:420px){.cards{grid-template-columns:1fr}.hero h1{font-size:35px}}
+    :root{--ink:#eff3ff;--muted:#aab3ce;--line:rgba(255,255,255,.14);--panel:rgba(14,21,49,.65);--accent:#8f81ff;--teal:#6ff4d7;--danger:#ff82a8;--bg:#070b1d}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+    body:before,body:after{content:"";position:fixed;inset:auto;z-index:-1;border-radius:50%;filter:blur(16px)}
+    body:before{width:42rem;height:42rem;top:-24rem;right:-10rem;background:#4a39a8;opacity:.62}
+    body:after{width:36rem;height:36rem;bottom:-18rem;left:-12rem;background:#0f6f6b;opacity:.38}
+    .shell{width:min(1120px,calc(100% - 24px));margin:auto;padding:24px 0 34px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:11px;font-size:20px;font-weight:760;letter-spacing:-.03em}
+    .mark{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:linear-gradient(145deg,#ab9fff,#65eed0);color:#111738;box-shadow:0 8px 24px #0007}
+    .nav{display:flex;gap:8px}
+    .tab{border:1px solid var(--line);background:#ffffff12;color:var(--ink);padding:8px 13px;border-radius:11px;cursor:pointer;font:inherit;font-weight:700}
+    .tab[aria-selected="true"]{background:linear-gradient(145deg,#988cff,#60e9cb);color:#10152f;border-color:transparent}
+    .view{display:none}
+    .view.active{display:block}
+    .panel,.card,dialog{background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(16px);box-shadow:0 16px 46px #0004}
+    .hero{padding:20px;border-radius:18px;margin-bottom:14px}
+    .hero h1{margin:0 0 6px;font-size:clamp(28px,4vw,44px);letter-spacing:-.05em}
+    .hero p{margin:0;color:var(--muted)}
+    .assistant-grid{display:grid;grid-template-columns:1fr 320px;gap:12px}
+    .chat-wrap{border-radius:18px;display:flex;flex-direction:column;min-height:540px;overflow:hidden}
+    .chat-head{padding:14px 16px;border-bottom:1px solid var(--line);color:var(--muted);font-size:13px}
+    .chat{padding:14px;display:grid;gap:10px;overflow:auto;flex:1}
+    .bubble{max-width:90%;padding:10px 12px;border-radius:12px}
+    .bubble.user{justify-self:end;background:linear-gradient(145deg,#8e83ff,#65ddc5);color:#10142f;font-weight:600}
+    .bubble.bot{justify-self:start;background:#ffffff12;border:1px solid #ffffff18}
+    .cards{display:grid;gap:8px}
+    .result-card{border:1px solid #ffffff18;border-radius:10px;padding:10px;background:#ffffff0b}
+    .small{font-size:13px;color:var(--muted)}
+    .composer{border-top:1px solid var(--line);padding:12px;display:flex;gap:9px}
+    .input{flex:1;border:1px solid var(--line);background:#ffffff0f;color:var(--ink);border-radius:11px;padding:11px 12px;font:inherit;outline:none}
+    .input:focus,.search:focus,input:focus{border-color:#9f95ff;box-shadow:0 0 0 3px #8f81ff2a}
+    .btn{border:0;border-radius:11px;padding:10px 12px;font:inherit;font-weight:700;cursor:pointer;background:var(--teal);color:#0e1330}
+    .btn.secondary{background:#ffffff12;color:var(--ink);border:1px solid var(--line)}
+    .prompt-panel{border-radius:18px;padding:14px}
+    .prompt-grid{display:grid;gap:8px;margin-top:9px}
+    .prompt{width:100%;text-align:left;padding:9px 10px;border-radius:10px;background:#ffffff10;border:1px solid var(--line);color:var(--ink);font:inherit;cursor:pointer}
+    .prompt:hover{background:#ffffff1a}
+    .empty{padding:18px;color:var(--muted);border:1px dashed #ffffff2b;border-radius:10px;text-align:center}
+
+    .directory{border-radius:18px;overflow:hidden}
+    .toolbar{padding:14px;display:flex;gap:10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+    .search{flex:1;min-width:220px;border:1px solid var(--line);background:#ffffff0f;color:var(--ink);border-radius:11px;padding:10px 11px;font:inherit;outline:none}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px}
+    .card{padding:12px;border-radius:13px}
+    .card span{display:block;color:var(--muted);font-size:12px}
+    .card strong{display:block;margin-top:6px;font-size:22px;letter-spacing:-.03em}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:13px 14px;text-align:left;border-bottom:1px solid #ffffff12}
+    th{font-size:12px;text-transform:uppercase;color:var(--muted);letter-spacing:.08em}
+    .role{padding:4px 8px;border-radius:999px;background:#ffffff14;font-size:12px}
+    .actions{display:flex;gap:7px}
+    .icon{border:0;background:transparent;color:var(--muted);font-size:15px;cursor:pointer;border-radius:8px;padding:4px}
+    .icon:hover{background:#ffffff16;color:#fff}
+
+    dialog{width:min(460px,calc(100% - 32px));padding:0;border-radius:18px;color:var(--ink)}
+    dialog::backdrop{background:#040717b8;backdrop-filter:blur(4px)}
+    .dialog-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px 8px}
+    .form{padding:8px 18px 18px;display:grid;gap:10px}
+    label{display:grid;gap:6px;font-size:13px;color:var(--muted);font-weight:650}
+    input{border:1px solid var(--line);background:#ffffff0e;color:var(--ink);border-radius:10px;padding:10px;font:inherit;outline:none}
+    .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+    .toast{position:fixed;right:20px;bottom:20px;background:#172349;border:1px solid var(--line);padding:11px 13px;border-radius:11px;transform:translateY(70px);opacity:0;transition:.2s}
+    .toast.show{transform:none;opacity:1}
+    .toast.error{border-color:var(--danger);color:#ffd7e4}
+
+    @media(max-width:980px){.assistant-grid{grid-template-columns:1fr}.chat-wrap{min-height:460px}}
+    @media(max-width:760px){.metrics{grid-template-columns:repeat(2,1fr)}table{min-width:680px}.directory{overflow:auto}}
+    @media(max-width:420px){.metrics{grid-template-columns:1fr}.composer{flex-direction:column}.btn{width:100%}}
   </style>
 </head>
 <body>
-<main class="shell"><header class="top"><div class="brand"><span class="mark">✦</span> PeopleDesk</div><div class="eyebrow">Employee workspace</div></header>
-<section class="hero"><div><div class="eyebrow">Directory</div><h1>Make people data<br>feel effortless.</h1><p>A focused, private workspace for maintaining an accurate employee directory.</p></div><button class="button" id="add">+ Add employee</button></section>
-<section class="cards"><article class="card"><span>Total employees</span><strong id="headcount">—</strong></article><article class="card"><span>Active roles</span><strong id="roles">—</strong></article><article class="card"><span>Monthly payroll</span><strong id="payroll">—</strong></article><article class="card"><span>Average salary</span><strong id="average">—</strong></article></section>
-<section class="directory"><div class="toolbar"><input id="search" class="search" placeholder="Search by name, role, or employee ID" aria-label="Search employees"><button class="button secondary" id="refresh">Refresh</button></div><table><thead><tr><th>Employee</th><th>ID</th><th>Role</th><th>Salary</th><th></th></tr></thead><tbody id="rows"></tbody></table><div id="empty" class="empty" hidden>No employees match your search.</div></section></main>
-<dialog id="modal"><div class="dialog-head"><h2 id="title">Add employee</h2><button class="icon" id="close" aria-label="Close">✕</button></div><form id="form" class="form"><label>Employee ID<input name="employee_id" type="number" min="1" required></label><label>Full name<input name="name" minlength="2" maxlength="80" required></label><label>Position<input name="position" minlength="2" maxlength="80" required></label><label>Monthly salary<input name="salary" type="number" min="0" step="0.01" required></label><div class="form-actions"><button type="button" class="button secondary" id="cancel">Cancel</button><button class="button" id="save">Save employee</button></div></form></dialog><div class="toast" id="toast" role="status"></div>
+<main class="shell">
+  <header class="top">
+    <div class="brand"><span class="mark">✦</span> Employee Assistant</div>
+    <nav class="nav" aria-label="Primary">
+      <button class="tab" id="tab-assistant" aria-selected="true" aria-controls="assistant-view">Assistant</button>
+      <button class="tab" id="tab-directory" aria-selected="false" aria-controls="directory-view">Directory/Admin</button>
+    </nav>
+  </header>
+
+  <section class="hero panel">
+    <h1>Welcome to your Employee Assistant</h1>
+    <p>Ask questions in plain language, then switch to Directory/Admin when you need to add, edit, search, or delete records.</p>
+  </section>
+
+  <section id="assistant-view" class="view active" role="tabpanel" aria-labelledby="tab-assistant">
+    <div class="assistant-grid">
+      <section class="chat-wrap panel">
+        <div class="chat-head">Conversation</div>
+        <div id="chat" class="chat" aria-live="polite"></div>
+        <form id="chat-form" class="composer">
+          <input id="chat-input" class="input" placeholder="Ask about employees, roles, payroll, or type help" aria-label="Message Employee Assistant" required>
+          <button class="btn" type="submit">Send</button>
+        </form>
+      </section>
+
+      <aside class="prompt-panel panel">
+        <strong>Suggested prompts</strong>
+        <p class="small">Try one to get started quickly.</p>
+        <div id="prompts" class="prompt-grid"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="directory-view" class="view" role="tabpanel" aria-labelledby="tab-directory">
+    <section class="directory panel">
+      <div class="toolbar">
+        <input id="search" class="search" placeholder="Search by name, role, or employee ID" aria-label="Search employees">
+        <button class="btn secondary" id="refresh">Refresh</button>
+        <button class="btn" id="add">+ Add employee</button>
+      </div>
+      <div class="metrics">
+        <article class="card"><span>Total employees</span><strong id="headcount">—</strong></article>
+        <article class="card"><span>Active roles</span><strong id="roles">—</strong></article>
+        <article class="card"><span>Payroll</span><strong id="payroll">—</strong></article>
+        <article class="card"><span>Average salary</span><strong id="average">—</strong></article>
+      </div>
+      <table>
+        <thead><tr><th>Employee</th><th>ID</th><th>Role</th><th>Salary</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div id="empty" class="empty" hidden>No employees found.</div>
+    </section>
+  </section>
+</main>
+
+<dialog id="modal">
+  <div class="dialog-head">
+    <h2 id="title">Add employee</h2>
+    <button class="icon" id="close" aria-label="Close">✕</button>
+  </div>
+  <form id="form" class="form">
+    <label>Employee ID<input name="employee_id" type="number" min="1" required></label>
+    <label>Full name<input name="name" minlength="2" maxlength="80" required></label>
+    <label>Position<input name="position" minlength="2" maxlength="80" required></label>
+    <label>Monthly salary<input name="salary" type="number" min="0" step="0.01" required></label>
+    <div class="form-actions">
+      <button type="button" class="btn secondary" id="cancel">Cancel</button>
+      <button class="btn" id="save">Save employee</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
 <script>
-const $=s=>document.querySelector(s),money=new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0});let editing=null,timer;const toast=(m,bad=false)=>{const t=$('#toast');t.textContent=m;t.className='toast show'+(bad?' error':'');clearTimeout(timer);timer=setTimeout(()=>t.className='toast',3000)};const initials=n=>n.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
-async function request(url,options){const r=await fetch(url,options);const data=r.status===204?null:await r.json();if(!r.ok)throw Error(data.error||'Something went wrong.');return data}async function load(){try{const [list,stats]=await Promise.all([request('/api/employees?q='+encodeURIComponent($('#search').value)),request('/api/stats')]);$('#headcount').textContent=stats.headcount;$('#roles').textContent=stats.roles;$('#payroll').textContent=money.format(stats.payroll);$('#average').textContent=money.format(stats.average_salary);const rows=$('#rows');rows.innerHTML='';$('#empty').hidden=list.employees.length>0;list.employees.forEach(e=>{const tr=document.createElement('tr');tr.innerHTML='<td><div class="person"><span class="avatar">'+initials(e.name)+'</span><span></span></div></td><td></td><td><span class="role"></span></td><td></td><td><div class="actions"><button class="icon" title="Edit">✎</button><button class="icon" title="Delete">⌫</button></div></td>';tr.querySelector('.person span:last-child').textContent=e.name;tr.children[1].textContent='#'+e.employee_id;tr.querySelector('.role').textContent=e.position;tr.children[3].textContent=money.format(e.salary);tr.querySelectorAll('button')[0].onclick=()=>open(e);tr.querySelectorAll('button')[1].onclick=()=>remove(e);rows.append(tr)})}catch(e){toast(e.message,true)}}
-function open(e){editing=e||null;$('#title').textContent=e?'Edit employee':'Add employee';const f=$('#form');f.reset();f.employee_id.disabled=!!e;if(e){f.elements.employee_id.value=e.employee_id;f.elements.name.value=e.name;f.elements.position.value=e.position;f.elements.salary.value=e.salary;}$('#modal').showModal();if(!e)f.employee_id.focus()}function close(){$('#modal').close()}async function remove(e){if(!confirm('Remove '+e.name+' from the directory?'))return;try{await request('/api/employees/'+e.employee_id,{method:'DELETE'});toast('Employee removed');load()}catch(err){toast(err.message,true)}}
-$('#add').onclick=()=>open();$('#close').onclick=close;$('#cancel').onclick=close;$('#refresh').onclick=load;$('#search').oninput=()=>{clearTimeout(timer);timer=setTimeout(load,220)};$('#form').onsubmit=async ev=>{ev.preventDefault();const f=ev.currentTarget,p=Object.fromEntries(new FormData(f));if(!editing)p.employee_id=Number(p.employee_id);p.salary=Number(p.salary);try{await request(editing?'/api/employees/'+editing.employee_id:'/api/employees',{method:editing?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});close();toast(editing?'Employee updated':'Employee added');load()}catch(e){toast(e.message,true)}};load();
-</script></body></html>
+const $=s=>document.querySelector(s);
+const money=new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0});
+const defaultPrompts=[
+  'Show all employees',
+  'Find employee by ID 101',
+  'Search employee by name Priya',
+  'List roles',
+  'Show payroll',
+  'Show average salary',
+  'Who has the highest salary?',
+  'Help'
+];
+let editing=null,toastTimer,searchTimer;
+
+const toast=(message,bad=false)=>{
+  const t=$('#toast');
+  t.textContent=message;
+  t.className='toast show'+(bad?' error':'');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.className='toast',3000);
+};
+
+async function request(url,options){
+  const response=await fetch(url,options);
+  const data=response.status===204?null:await response.json();
+  if(!response.ok) throw Error(data?.error||'Something went wrong.');
+  return data;
+}
+
+function switchView(view){
+  const assistant=view==='assistant';
+  $('#assistant-view').classList.toggle('active',assistant);
+  $('#directory-view').classList.toggle('active',!assistant);
+  $('#tab-assistant').setAttribute('aria-selected',String(assistant));
+  $('#tab-directory').setAttribute('aria-selected',String(!assistant));
+  if(assistant){
+    $('#chat-input').focus();
+  } else {
+    $('#search').focus();
+  }
+}
+
+function bubble(text,type='bot'){
+  const node=document.createElement('div');
+  node.className='bubble '+type;
+  node.textContent=text;
+  $('#chat').append(node);
+  $('#chat').scrollTop=$('#chat').scrollHeight;
+}
+
+function employeeCards(employees){
+  if(!employees?.length){
+    const empty=document.createElement('div');
+    empty.className='empty';
+    empty.textContent='No matching employees.';
+    return empty;
+  }
+  const wrap=document.createElement('div');
+  wrap.className='cards';
+  employees.forEach(e=>{
+    const card=document.createElement('div');
+    card.className='result-card';
+    card.innerHTML=`<strong>${e.name}</strong><div class="small">ID #${e.employee_id} · ${e.position}</div><div>${money.format(e.salary)}</div>`;
+    wrap.append(card);
+  });
+  return wrap;
+}
+
+function roleCards(roles){
+  if(!roles?.length){
+    const empty=document.createElement('div');
+    empty.className='empty';
+    empty.textContent='No roles available.';
+    return empty;
+  }
+  const wrap=document.createElement('div');
+  wrap.className='cards';
+  roles.forEach(r=>{
+    const card=document.createElement('div');
+    card.className='result-card';
+    card.innerHTML=`<strong>${r.name}</strong><div class="small">${r.count} employee(s)</div>`;
+    wrap.append(card);
+  });
+  return wrap;
+}
+
+function metricCard(label,value){
+  const card=document.createElement('div');
+  card.className='result-card';
+  card.innerHTML=`<div class="small">${label}</div><strong>${value}</strong>`;
+  return card;
+}
+
+function renderChatResults(payload){
+  const {intent,results}=payload;
+  let node=null;
+
+  if(intent==='show_all_employees' || intent==='find_employee'){
+    node=employeeCards(results.employees||[]);
+  } else if(intent==='list_roles'){
+    node=roleCards(results.roles||[]);
+  } else if(intent==='payroll'){
+    node=metricCard('Payroll',money.format(results.payroll||0));
+  } else if(intent==='average_salary'){
+    node=metricCard('Average salary',money.format(results.average_salary||0));
+  } else if(intent==='highest_salary' && results.employee){
+    node=employeeCards([results.employee]);
+  } else if(intent==='help'){
+    node=document.createElement('div');
+    node.className='cards';
+    (results.capabilities||[]).forEach(item=>{
+      const card=document.createElement('div');
+      card.className='result-card';
+      card.textContent=item;
+      node.append(card);
+    });
+  }
+
+  if(node){
+    $('#chat').append(node);
+    $('#chat').scrollTop=$('#chat').scrollHeight;
+  }
+
+  if(Array.isArray(payload.suggested_prompts) && payload.suggested_prompts.length){
+    renderPrompts(payload.suggested_prompts);
+  }
+}
+
+async function sendPrompt(message){
+  const text=String(message||'').trim();
+  if(!text) return;
+  bubble(text,'user');
+  try{
+    const payload=await request('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});
+    bubble(payload.message,'bot');
+    renderChatResults(payload);
+  }catch(error){
+    bubble(error.message,'bot');
+    toast(error.message,true);
+  }
+}
+
+function renderPrompts(prompts){
+  const target=$('#prompts');
+  target.innerHTML='';
+  prompts.forEach(prompt=>{
+    const button=document.createElement('button');
+    button.type='button';
+    button.className='prompt';
+    button.textContent=prompt;
+    button.onclick=()=>sendPrompt(prompt);
+    target.append(button);
+  });
+}
+
+function initials(name){
+  return name.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
+}
+
+async function loadDirectory(){
+  try{
+    const [list,stats]=await Promise.all([
+      request('/api/employees?q='+encodeURIComponent($('#search').value.trim())),
+      request('/api/stats')
+    ]);
+    $('#headcount').textContent=stats.headcount;
+    $('#roles').textContent=stats.roles;
+    $('#payroll').textContent=money.format(stats.payroll);
+    $('#average').textContent=money.format(stats.average_salary);
+
+    const rows=$('#rows');
+    rows.innerHTML='';
+    $('#empty').hidden=list.employees.length>0;
+    list.employees.forEach(employee=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML='<td><strong></strong></td><td></td><td><span class="role"></span></td><td></td><td><div class="actions"><button class="icon" title="Edit">✎</button><button class="icon" title="Delete">⌫</button></div></td>';
+      tr.children[0].querySelector('strong').textContent=`${employee.name} (${initials(employee.name)})`;
+      tr.children[1].textContent='#'+employee.employee_id;
+      tr.querySelector('.role').textContent=employee.position;
+      tr.children[3].textContent=money.format(employee.salary);
+      tr.querySelectorAll('button')[0].onclick=()=>openModal(employee);
+      tr.querySelectorAll('button')[1].onclick=()=>removeEmployee(employee);
+      rows.append(tr);
+    });
+  }catch(error){
+    toast(error.message,true);
+  }
+}
+
+function openModal(employee){
+  editing=employee||null;
+  $('#title').textContent=employee?'Edit employee':'Add employee';
+  const form=$('#form');
+  form.reset();
+  form.employee_id.disabled=!!employee;
+  if(employee){
+    form.elements.employee_id.value=employee.employee_id;
+    form.elements.name.value=employee.name;
+    form.elements.position.value=employee.position;
+    form.elements.salary.value=employee.salary;
+  }
+  $('#modal').showModal();
+  if(!employee) form.employee_id.focus();
+}
+
+function closeModal(){ $('#modal').close(); }
+
+async function removeEmployee(employee){
+  if(!confirm(`Remove ${employee.name} from the directory?`)) return;
+  try{
+    await request('/api/employees/'+employee.employee_id,{method:'DELETE'});
+    toast('Employee removed');
+    loadDirectory();
+  }catch(error){
+    toast(error.message,true);
+  }
+}
+
+$('#tab-assistant').onclick=()=>switchView('assistant');
+$('#tab-directory').onclick=()=>switchView('directory');
+$('#chat-form').onsubmit=async event=>{
+  event.preventDefault();
+  const input=$('#chat-input');
+  const text=input.value;
+  input.value='';
+  await sendPrompt(text);
+};
+
+$('#add').onclick=()=>openModal();
+$('#close').onclick=closeModal;
+$('#cancel').onclick=closeModal;
+$('#refresh').onclick=loadDirectory;
+$('#search').oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(loadDirectory,220);};
+
+$('#form').onsubmit=async event=>{
+  event.preventDefault();
+  const form=event.currentTarget;
+  const payload=Object.fromEntries(new FormData(form));
+  if(!editing) payload.employee_id=Number(payload.employee_id);
+  payload.salary=Number(payload.salary);
+
+  try{
+    await request(editing?'/api/employees/'+editing.employee_id:'/api/employees',{
+      method:editing?'PUT':'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    closeModal();
+    toast(editing?'Employee updated':'Employee added');
+    loadDirectory();
+  }catch(error){
+    toast(error.message,true);
+  }
+};
+
+renderPrompts(defaultPrompts);
+bubble('Hi! I am your Employee Assistant. Ask me about employees, roles, payroll, or salary insights.','bot');
+loadDirectory();
+$('#chat-input').focus();
+</script>
+</body>
+</html>

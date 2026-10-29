@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import threading
 from pathlib import Path
 from typing import Any
@@ -11,6 +12,16 @@ from flask import Flask, jsonify, render_template, request
 BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = Path(os.environ.get("EMPLOYEE_DATA_FILE", BASE_DIR / "employees.xlsx"))
 COLUMNS = ["Employee ID", "Name", "Position", "Salary"]
+SUGGESTED_PROMPTS = [
+    "Show all employees",
+    "Find employee by ID 101",
+    "Search employee by name Priya",
+    "List roles",
+    "Show payroll",
+    "Show average salary",
+    "Who has the highest salary?",
+    "Help",
+]
 lock = threading.RLock()
 
 app = Flask(__name__)
@@ -86,6 +97,47 @@ def to_record(row: pd.Series) -> dict[str, Any]:
     }
 
 
+def to_records(frame: pd.DataFrame) -> list[dict[str, Any]]:
+    if frame.empty:
+        return []
+    ordered = frame.sort_values(["Name", "Employee ID"], kind="stable")
+    return [to_record(row) for _, row in ordered.iterrows()]
+
+
+def chat_response(intent: str, message: str, results: dict[str, Any] | None = None):
+    return jsonify({
+        "intent": intent,
+        "message": message,
+        "results": results or {},
+        "suggested_prompts": SUGGESTED_PROMPTS,
+    })
+
+
+def extract_name_term(message: str) -> str:
+    quoted = re.search(r'"([^"]{2,80})"', message)
+    if quoted:
+        return quoted.group(1).strip()
+
+    lowered = message.lower()
+    cleaned = re.sub(r"[^a-z0-9\s]", " ", lowered)
+    cleaned = re.sub(
+        r"\b(show|list|find|search|lookup|employee|employees|by|name|id|for|please|me|the|a|an|with|called|named)\b",
+        " ",
+        cleaned,
+    )
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    if len(cleaned) >= 2:
+        return cleaned
+    return ""
+
+
+def parse_employee_id(message: str) -> int | None:
+    match = re.search(r"(?:employee\s*id|id|employee)\s*[:#-]?\s*(\d+)", message, re.IGNORECASE)
+    if match:
+        return int(match.group(1))
+    return None
+
+
 @app.get("/")
 def index():
     return render_template("index.html")
@@ -114,6 +166,120 @@ def stats():
         "average_salary": total_salary / len(frame) if len(frame) else 0,
         "roles": int(frame["Position"].nunique()) if not frame.empty else 0,
     })
+
+
+@app.post("/api/chat")
+def chat():
+    payload = request.get_json(silent=True) or {}
+    message = str(payload.get("message", "")).strip()
+    if not message:
+        raise ValueError("Please enter a message for the assistant.")
+
+    normalized = message.lower()
+
+    with lock:
+        frame = load_employees()
+
+    if any(keyword in normalized for keyword in ["help", "what can you do", "commands", "options"]):
+        return chat_response(
+            "help",
+            "I can search the directory, list roles, and answer payroll questions. Try one of the suggested prompts.",
+            {
+                "capabilities": [
+                    "Show all employees",
+                    "Find employee by ID or name",
+                    "List available roles",
+                    "Show payroll totals and salary insights",
+                ],
+            },
+        )
+
+    if any(keyword in normalized for keyword in ["all employees", "show employees", "list employees", "show all"]):
+        employees = to_records(frame)
+        return chat_response(
+            "show_all_employees",
+            "Here is the full employee directory." if employees else "No employees are currently available.",
+            {"employees": employees, "count": len(employees)},
+        )
+
+    if "role" in normalized or "position" in normalized:
+        if frame.empty:
+            return chat_response("list_roles", "No roles are available because the directory is empty.", {"roles": []})
+        role_counts = frame["Position"].astype(str).value_counts().sort_index()
+        roles = [{"name": role, "count": int(count)} for role, count in role_counts.items()]
+        return chat_response("list_roles", "Here are the roles in your directory.", {"roles": roles})
+
+    if "highest" in normalized and "salary" in normalized or "top salary" in normalized or "highest paid" in normalized:
+        if frame.empty:
+            return chat_response("highest_salary", "No salary data is available yet.", {})
+        top = frame.loc[frame["Salary"].idxmax()]
+        employee = to_record(top)
+        return chat_response(
+            "highest_salary",
+            f"{employee['name']} has the highest salary right now.",
+            {"employee": employee, "highest_salary": employee["salary"]},
+        )
+
+    if "average" in normalized and "salary" in normalized:
+        average_salary = float(frame["Salary"].mean()) if not frame.empty else 0.0
+        return chat_response(
+            "average_salary",
+            "Here is the current average salary.",
+            {"average_salary": average_salary, "headcount": int(len(frame))},
+        )
+
+    if "payroll" in normalized or ("total" in normalized and "salary" in normalized):
+        payroll_value = float(frame["Salary"].sum()) if not frame.empty else 0.0
+        return chat_response(
+            "payroll",
+            "Here is the current payroll total.",
+            {"payroll": payroll_value, "headcount": int(len(frame))},
+        )
+
+    if any(keyword in normalized for keyword in ["find", "search", "lookup", "employee id", "by id", "by name"]):
+        employee_id = parse_employee_id(message)
+        if employee_id is not None:
+            matches = frame[frame["Employee ID"] == employee_id]
+            if matches.empty:
+                return chat_response(
+                    "find_employee",
+                    f"I could not find an employee with ID {employee_id}.",
+                    {"employees": [], "query": {"employee_id": employee_id}},
+                )
+            employees = to_records(matches)
+            return chat_response(
+                "find_employee",
+                f"I found {employees[0]['name']} for employee ID {employee_id}.",
+                {"employees": employees, "query": {"employee_id": employee_id}},
+            )
+
+        term = extract_name_term(message)
+        if term:
+            matches = frame[frame["Name"].astype(str).str.contains(term, case=False, regex=False)]
+            employees = to_records(matches)
+            if employees:
+                return chat_response(
+                    "find_employee",
+                    f"I found {len(employees)} matching employee(s) for “{term}”.",
+                    {"employees": employees, "query": {"name": term}},
+                )
+            return chat_response(
+                "find_employee",
+                f"I could not find anyone matching “{term}”.",
+                {"employees": [], "query": {"name": term}},
+            )
+
+        return chat_response(
+            "find_employee",
+            "Please include an employee name or ID to search.",
+            {"employees": []},
+        )
+
+    return chat_response(
+        "unknown",
+        "I did not understand that yet. Try asking for employees, roles, payroll, or say help.",
+        {},
+    )
 
 
 @app.post("/api/employees")
