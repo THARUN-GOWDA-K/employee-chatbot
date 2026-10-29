@@ -132,10 +132,10 @@ def extract_name_term(message: str) -> str:
 
 
 def parse_employee_id(message: str) -> int | None:
-    match = re.search(r"(?:employee\s*id|id|employee)\s*[:#-]?\s*(\d+)", message, re.IGNORECASE)
-    if match:
-        return int(match.group(1))
-    return None
+    numbers = re.findall(r"\d+", message)
+    if not numbers:
+        return None
+    return int(numbers[0])
 
 
 @app.get("/")
